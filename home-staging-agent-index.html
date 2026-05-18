@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Staging Agent">
+<title>Home Staging Content Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --cream: #FAF8F4;
+    --warm-white: #FFFFFF;
+    --stone: #E8E3DC;
+    --stone-dark: #C9C2B8;
+    --ink: #1C1917;
+    --ink-light: #57534E;
+    --ink-faint: #A8A29E;
+    --sage: #5C7A5C;
+    --sage-light: #EBF2EB;
+    --terracotta: #C4614A;
+    --terra-light: #FAF0ED;
+    --gold: #B8860B;
+    --gold-light: #FDF8E8;
+    --blue: #3B6B9E;
+    --blue-light: #EBF1F8;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 12px rgba(28,25,23,0.08);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    min-height: 100vh;
+    max-width: 430px;
+    margin: 0 auto;
+    padding-bottom: 80px;
+  }
+
+  /* HEADER */
+  .header {
+    background: var(--warm-white);
+    padding: 52px 20px 16px;
+    border-bottom: 1px solid var(--stone);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .header-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .header-title { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--ink); letter-spacing: -0.3px; }
+  .header-date { font-size: 11px; color: var(--ink-faint); background: var(--cream); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--stone); }
+
+  /* TABS */
+  .tabs { display: flex; gap: 0; overflow-x: auto; scrollbar-width: none; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    flex-shrink: 0;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 8px 16px;
+    color: var(--ink-faint);
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.15s;
+  }
+  .tab.active { color: var(--ink); border-bottom-color: var(--ink); }
+
+  /* PANELS */
+  .panel { display: none; padding: 20px 16px; }
+  .panel.active { display: block; }
+
+  /* SECTION LABEL */
+  .slbl {
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+
+  /* FUNNEL PILLS */
+  .funnel-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+  .funnel-pill { border-radius: var(--radius-sm); padding: 10px 12px; }
+  .funnel-pill.ed { background: var(--blue-light); }
+  .funnel-pill.ins { background: var(--gold-light); }
+  .funnel-pill.tr { background: var(--sage-light); }
+  .funnel-pill.cv { background: var(--terra-light); }
+  .fp-label { font-size: 10px; font-weight: 500; margin-bottom: 2px; }
+  .funnel-pill.ed .fp-label { color: var(--blue); }
+  .funnel-pill.ins .fp-label { color: var(--gold); }
+  .funnel-pill.tr .fp-label { color: var(--sage); }
+  .funnel-pill.cv .fp-label { color: var(--terracotta); }
+  .fp-desc { font-size: 10px; color: var(--ink-light); line-height: 1.4; }
+
+  /* CONTROLS */
+  .controls { display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px; }
+  select {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--stone);
+    background: var(--warm-white);
+    color: var(--ink);
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23A8A29E' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+  }
+  .gen-btn {
+    width: 100%;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--ink);
+    color: var(--warm-white);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: opacity 0.15s;
+  }
+  .gen-btn:active { opacity: 0.8; }
+  .gen-btn:disabled { opacity: 0.4; }
+
+  /* IDEA CARDS */
+  .ideas-list { display: flex; flex-direction: column; gap: 12px; }
+  .idea-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    border: 1.5px solid var(--stone);
+    padding: 16px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    box-shadow: var(--shadow);
+  }
+  .idea-card.selected { border-color: var(--ink); }
+  .idea-card:active { opacity: 0.9; }
+  .pillar-badge {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 500;
+    padding: 3px 9px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .pb-Educate { background: var(--blue-light); color: var(--blue); }
+  .pb-Inspire { background: var(--gold-light); color: var(--gold); }
+  .pb-Trust { background: var(--sage-light); color: var(--sage); }
+  .pb-Convert { background: var(--terra-light); color: var(--terracotta); }
+  .idea-title { font-size: 15px; font-weight: 500; color: var(--ink); margin-bottom: 6px; line-height: 1.35; }
+  .idea-hook { font-size: 12px; color: var(--ink-light); line-height: 1.5; margin-bottom: 10px; font-style: italic; }
+  .idea-meta { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
+  .meta-item { font-size: 11px; color: var(--ink-faint); display: flex; align-items: center; gap: 4px; }
+  .idea-staging { font-size: 11px; color: var(--terracotta); background: var(--terra-light); border-radius: var(--radius-sm); padding: 7px 10px; line-height: 1.4; }
+  .idea-staging::before { content: '🏠 '; }
+
+  /* LOADING */
+  .loading { display: flex; align-items: center; justify-content: center; min-height: 160px; flex-direction: column; gap: 10px; }
+  .spinner { width: 20px; height: 20px; border: 2px solid var(--stone); border-top-color: var(--ink-light); border-radius: 50%; animation: spin 0.7s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 13px; color: var(--ink-faint); }
+
+  /* EMPTY STATE */
+  .empty { text-align: center; padding: 48px 20px; color: var(--ink-faint); }
+  .empty-icon { font-size: 36px; margin-bottom: 12px; }
+  .empty-text { font-size: 13px; line-height: 1.5; }
+
+  /* CHAT */
+  .sel-banner {
+    background: var(--sage-light);
+    border-radius: var(--radius-sm);
+    padding: 9px 13px;
+    margin-bottom: 14px;
+    font-size: 12px;
+    color: var(--sage);
+    display: none;
+    align-items: flex-start;
+    gap: 6px;
+    line-height: 1.4;
+  }
+  .sel-banner strong { color: var(--ink); font-weight: 500; }
+  .chat-msgs { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; min-height: 220px; }
+  .msg { max-width: 88%; padding: 11px 14px; border-radius: var(--radius); font-size: 13px; line-height: 1.6; }
+  .msg.user { align-self: flex-end; background: var(--ink); color: var(--warm-white); border-bottom-right-radius: 4px; }
+  .msg.ai { align-self: flex-start; background: var(--warm-white); color: var(--ink); border: 1px solid var(--stone); border-bottom-left-radius: 4px; box-shadow: var(--shadow); }
+  .quick-qs { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 12px; }
+  .quick-q {
+    font-size: 11px;
+    padding: 6px 11px;
+    border-radius: 20px;
+    border: 1px solid var(--stone);
+    background: var(--warm-white);
+    color: var(--ink-light);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .quick-q:active { background: var(--cream); }
+  .chat-input-row { display: flex; gap: 8px; position: sticky; bottom: 0; background: var(--cream); padding: 10px 0 4px; }
+  .chat-input {
+    flex: 1;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 12px 14px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--stone);
+    background: var(--warm-white);
+    color: var(--ink);
+  }
+  .send-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-sm);
+    border: none;
+    background: var(--ink);
+    color: var(--warm-white);
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+  .send-btn:active { opacity: 0.8; }
+
+  /* TIMING */
+  .t-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    border: 1px solid var(--stone);
+    padding: 15px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .t-platform { font-size: 12px; font-weight: 500; color: var(--ink-light); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
+  .t-slots { font-size: 13px; color: var(--ink); line-height: 2; }
+  .t-note { font-size: 11px; color: var(--ink-faint); margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--stone); line-height: 1.4; }
+  .tip-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    border: 1px solid var(--stone);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .tip-icon { font-size: 20px; flex-shrink: 0; margin-top: 1px; }
+  .tip-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 3px; }
+  .tip-desc { font-size: 12px; color: var(--ink-light); line-height: 1.5; }
+
+  /* RESOURCES */
+  .src-card {
+    background: var(--warm-white);
+    border-radius: var(--radius);
+    border: 1px solid var(--stone);
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    box-shadow: var(--shadow);
+  }
+  .src-name { font-size: 14px; font-weight: 500; color: var(--ink); margin-bottom: 4px; }
+  .src-desc { font-size: 12px; color: var(--ink-light); line-height: 1.5; margin-bottom: 8px; }
+  .src-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+  .src-tag { font-size: 10px; padding: 3px 8px; border-radius: 20px; background: var(--cream); color: var(--ink-faint); border: 1px solid var(--stone); }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 430px;
+    background: var(--warm-white);
+    border-top: 1px solid var(--stone);
+    display: flex;
+    padding: 8px 0 20px;
+    z-index: 200;
+  }
+  .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    cursor: pointer;
+    padding: 6px 0;
+    color: var(--ink-faint);
+    font-size: 10px;
+    font-weight: 500;
+    transition: color 0.12s;
+  }
+  .nav-item.active { color: var(--ink); }
+  .nav-icon { font-size: 22px; line-height: 1; }
+
+  .div { height: 1px; background: var(--stone); margin: 18px 0; }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-top">
+    <div class="header-title">Staging Agent ✦</div>
+    <div class="header-date" id="dateLabel"></div>
+  </div>
+  <div class="tabs">
+    <div class="tab active" onclick="sw('ideas')">Daily Ideas</div>
+    <div class="tab" onclick="sw('chat')">Ask AI</div>
+    <div class="tab" onclick="sw('timing')">Timing</div>
+    <div class="tab" onclick="sw('resources')">Resources</div>
+  </div>
+</div>
+
+<!-- IDEAS -->
+<div class="panel active" id="panel-ideas">
+  <div class="slbl" style="margin-bottom:10px;">Your content funnel</div>
+  <div class="funnel-row" style="margin-bottom:18px;">
+    <div class="funnel-pill ed"><div class="fp-label">Educate</div><div class="fp-desc">Tips & how-tos — build authority</div></div>
+    <div class="funnel-pill ins"><div class="fp-label">Inspire</div><div class="fp-desc">Before/afters — build desire</div></div>
+    <div class="funnel-pill tr"><div class="fp-label">Trust</div><div class="fp-desc">Your home, your process</div></div>
+    <div class="funnel-pill cv"><div class="fp-label">Convert</div><div class="fp-desc">Warm up staging clients</div></div>
+  </div>
+
+  <div class="controls">
+    <select id="focus">
+      <option value="a mix of all four pillars (Educate, Inspire, Trust, Convert)">Mix all pillars</option>
+      <option value="Educate — decor tips and how-tos">Educate — tips & how-tos</option>
+      <option value="Inspire — transformations and before/afters">Inspire — before/afters</option>
+      <option value="Trust — behind the scenes of your home">Trust — behind the scenes</option>
+      <option value="Convert — attract home staging clients">Convert — attract clients</option>
+    </select>
+    <select id="platform">
+      <option value="Instagram Reels and TikTok (30–60 second vertical videos)">Instagram Reels + TikTok</option>
+      <option value="YouTube Shorts (under 60 seconds)">YouTube Shorts</option>
+      <option value="Pinterest video pins">Pinterest</option>
+      <option value="all short-form platforms">All platforms</option>
+    </select>
+    <button class="gen-btn" id="genBtn" onclick="genIdeas()">
+      ✦ Generate today's ideas
+    </button>
+  </div>
+
+  <div id="ideasBox">
+    <div class="empty">
+      <div class="empty-icon">🏠</div>
+      <div class="empty-text">Choose your focus and platform above,<br>then tap Generate.</div>
+    </div>
+  </div>
+</div>
+
+<!-- CHAT -->
+<div class="panel" id="panel-chat">
+  <div class="sel-banner" id="selBanner">
+    📌 Discussing: <strong id="selTitle"></strong>
+  </div>
+  <div class="chat-msgs" id="chatMsgs">
+    <div class="empty">
+      <div class="empty-icon">💬</div>
+      <div class="empty-text">Generate ideas first, then come here to ask for scripts, hooks, hashtags, filming tips, or staging business advice.</div>
+    </div>
+  </div>
+  <div class="quick-qs" id="quickQs" style="display:none">
+    <span class="quick-q" onclick="sq('Write me a full 45-second script for this video.')">Write a script</span>
+    <span class="quick-q" onclick="sq('How do I film this solo at home with just my iPhone?')">Film solo at home</span>
+    <span class="quick-q" onclick="sq('Give me 15 hashtags for this video.')">Hashtags</span>
+    <span class="quick-q" onclick="sq('Write 3 different hook options for the opening 3 seconds.')">Hook variations</span>
+    <span class="quick-q" onclick="sq('How can I use this video to attract home staging clients?')">Attract staging clients</span>
+    <span class="quick-q" onclick="sq('What call to action should I use at the end?')">CTA ideas</span>
+  </div>
+  <div class="chat-input-row">
+    <input class="chat-input" type="text" id="chatIn" placeholder="Ask about scripts, hashtags, staging…" onkeydown="if(event.key==='Enter')sendChat()" />
+    <button class="send-btn" onclick="sendChat()">↑</button>
+  </div>
+</div>
+
+<!-- TIMING -->
+<div class="panel" id="panel-timing">
+  <div class="slbl">Best posting times — Melbourne (AEST)</div>
+
+  <div class="t-card">
+    <div class="t-platform">📸 Instagram Reels</div>
+    <div class="t-slots">Mon–Fri: 7–9am<br>Tue/Wed: 12–1pm<br>Thu/Fri: 5–7pm<br>Sunday: 9–11am</div>
+    <div class="t-note">Reels are pushed to non-followers in the first 60 min — post and reply to comments immediately to boost reach.</div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-platform">🎵 TikTok</div>
+    <div class="t-slots">Tue/Thu: 6–9am<br>Mon/Wed: 12–3pm<br>Friday: 4–7pm<br>Saturday: 9–11am</div>
+    <div class="t-note">Post 1–2× daily for FYP algorithm boost. Batch-film 10 videos on Sunday to cover the week.</div>
+  </div>
+
+  <div class="t-card">
+    <div class="t-platform">📌 Pinterest</div>
+    <div class="t-slots">Sat/Sun: 8–11pm<br>Friday: 3–8pm<br>Weekdays: 2–4pm</div>
+    <div class="t-note">Pins live for months — great for staging discovery by sellers searching for home prep ideas.</div>
+  </div>
+
+  <div class="div"></div>
+  <div class="slbl">Consistency plan</div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🌱</div>
+    <div><div class="tip-title">Starter: 3× per week (Mon, Wed, Fri)</div><div class="tip-desc">The minimum to keep the algorithm warm. Sustainable indefinitely — great while building your filming routine.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">📈</div>
+    <div><div class="tip-title">Growth: 5× per week (add Tue + Thu)</div><div class="tip-desc">Doubles your discovery surface. Batch-film 5 videos on Sunday — one session covers the whole week.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🚀</div>
+    <div><div class="tip-title">Breakout: daily for 30 days</div><div class="tip-desc">Algorithms prioritise daily posters in search and discovery. This is when channels break out — then drop to 5×/week to maintain.</div></div>
+  </div>
+
+  <div class="div"></div>
+  <div class="slbl">Reach tactics for home staging</div>
+
+  <div class="tip-card">
+    <div class="tip-icon">🏷️</div>
+    <div><div class="tip-title">Use real estate + decor hashtag stacks</div><div class="tip-desc">Mix #homestaging #interiorstyling #realestate with suburb tags like #melbournehomes. Sellers find staging content through property searches.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">↔️</div>
+    <div><div class="tip-title">Before/after is your highest-converting format</div><div class="tip-desc">Film your own rooms styled vs unstyled. Viewers share these and they directly show your staging value to potential clients.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">🤝</div>
+    <div><div class="tip-title">Tag local real estate agents</div><div class="tip-desc">Tag agents in decor tip videos. When they share to their audience, their seller clients become warm staging leads for you.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">📩</div>
+    <div><div class="tip-title">Add a booking CTA in every video</div><div class="tip-desc">Point to a simple "Book a staging consult" link in bio. Start collecting interested leads now — even before you officially launch.</div></div>
+  </div>
+</div>
+
+<!-- RESOURCES -->
+<div class="panel" id="panel-resources">
+  <div class="slbl">Free image &amp; video sources</div>
+
+  <div class="src-card">
+    <div class="src-name">Unsplash</div>
+    <div class="src-desc">The best free photography for interiors and home decor. No attribution needed. Search "styled living room", "minimal home", "cosy interiors".</div>
+    <div class="src-tags"><span class="src-tag">photos</span><span class="src-tag">interiors</span><span class="src-tag">free forever</span></div>
+  </div>
+  <div class="src-card">
+    <div class="src-name">Pexels</div>
+    <div class="src-desc">Free stock photos and videos. Great for B-roll footage of rooms and furniture details to cut into your edits.</div>
+    <div class="src-tags"><span class="src-tag">photos</span><span class="src-tag">video B-roll</span><span class="src-tag">rooms</span></div>
+  </div>
+  <div class="src-card">
+    <div class="src-name">Mixkit</div>
+    <div class="src-desc">Free video clips and background music specifically made for social media creators. Essential for adding polish without paying for music.</div>
+    <div class="src-tags"><span class="src-tag">video clips</span><span class="src-tag">music</span><span class="src-tag">sound fx</span></div>
+  </div>
+  <div class="src-card">
+    <div class="src-name">Canva (free)</div>
+    <div class="src-desc">Text overlays, before/after frames, tip cards, and thumbnail templates. Makes your videos look edited even when they're simple.</div>
+    <div class="src-tags"><span class="src-tag">templates</span><span class="src-tag">text overlays</span><span class="src-tag">thumbnails</span></div>
+  </div>
+  <div class="src-card">
+    <div class="src-name">CapCut (free iPhone app)</div>
+    <div class="src-desc">Free video editor with auto-captions, trending templates, and text animations. Most home decor creators use this to edit Reels and TikToks on their phone.</div>
+    <div class="src-tags"><span class="src-tag">editing</span><span class="src-tag">captions</span><span class="src-tag">iPhone</span></div>
+  </div>
+  <div class="src-card">
+    <div class="src-name">Pixabay</div>
+    <div class="src-desc">CC0 licensed photos, videos, and music. Good backup source when Unsplash and Pexels don't have what you need.</div>
+    <div class="src-tags"><span class="src-tag">photos</span><span class="src-tag">music</span><span class="src-tag">CC0</span></div>
+  </div>
+
+  <div class="div"></div>
+  <div class="slbl">Filming your home — iPhone tips</div>
+
+  <div class="tip-card">
+    <div class="tip-icon">☀️</div>
+    <div><div class="tip-title">Natural light at golden hour (7–9am / 4–6pm)</div><div class="tip-desc">Face your window while filming. Cloudy days give soft, flattering light — perfect for talking-head or close-up detail shots.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">📐</div>
+    <div><div class="tip-title">Pick 2–3 signature spots in your home</div><div class="tip-desc">Viewers build familiarity with your backgrounds. You save setup time — walk in, film, done. Your home becomes your brand.</div></div>
+  </div>
+  <div class="tip-card">
+    <div class="tip-icon">📱</div>
+    <div><div class="tip-title">iPhone on a tripod is all you need</div><div class="tip-desc">Film vertical at 4K. Use the back camera (better quality) and a small mirror to check framing. A cheap ring light handles evening shots.</div></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="nav-item active" id="nav-ideas" onclick="sw('ideas')">
+    <div class="nav-icon">💡</div>
+    <div>Ideas</div>
+  </div>
+  <div class="nav-item" id="nav-chat" onclick="sw('chat')">
+    <div class="nav-icon">💬</div>
+    <div>Ask AI</div>
+  </div>
+  <div class="nav-item" id="nav-timing" onclick="sw('timing')">
+    <div class="nav-icon">🕐</div>
+    <div>Timing</div>
+  </div>
+  <div class="nav-item" id="nav-resources" onclick="sw('resources')">
+    <div class="nav-icon">🖼️</div>
+    <div>Resources</div>
+  </div>
+</div>
+
+<script>
+const API = "https://api.anthropic.com/v1/messages";
+let selectedIdea = null;
+let chatHistory = [];
+
+// Date
+const d = new Date();
+document.getElementById('dateLabel').textContent = d.toLocaleDateString('en-AU', {weekday:'short', day:'numeric', month:'short'});
+
+// Tab switching
+function sw(name) {
+  const panels = ['ideas','chat','timing','resources'];
+  panels.forEach(p => {
+    document.getElementById('panel-'+p).classList.toggle('active', p===name);
+    document.getElementById('nav-'+p).classList.toggle('active', p===name);
+  });
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', panels[i]===name));
+}
+
+// Claude API call
+async function claude(messages, system) {
+  const r = await fetch(API, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system,
+      messages
+    })
+  });
+  const data = await r.json();
+  if (data.error) throw new Error(data.error.message);
+  return data.content.map(b => b.text || '').join('');
+}
+
+// Generate ideas
+async function genIdeas() {
+  const focus = document.getElementById('focus').value;
+  const platform = document.getElementById('platform').value;
+  const btn = document.getElementById('genBtn');
+  btn.disabled = true;
+  btn.textContent = 'Thinking…';
+  document.getElementById('ideasBox').innerHTML = '<div class="loading"><div class="spinner"></div><div class="loading-text">Crafting your ideas…</div></div>';
+
+  const today = new Date().toLocaleDateString('en-AU', {weekday:'long', day:'numeric', month:'long'});
+  const sys = `You are a social media strategist specialising in home decor and home staging businesses. Return ONLY valid JSON array, no markdown, no backticks, no extra text.`;
+  const prompt = `Today is ${today}. A creator in Melbourne, Australia films home decor content on their iPhone at home. Their goal is to build an audience that will eventually hire them for home staging services (helping sellers prepare homes for sale).
+
+Generate 4 short-form video ideas. Focus: "${focus}". Platform: "${platform}".
+
+Each idea must be:
+- Filmable solo at home with just an iPhone
+- Use free stock images/text overlays when needed (Unsplash, Canva, Pexels)
+- Naturally build authority or trust around home staging
+
+Return a JSON array of exactly 4 objects with these keys:
+{
+  "pillar": "Educate" or "Inspire" or "Trust" or "Convert",
+  "title": "video title (compelling, specific)",
+  "hook": "the exact opening line spoken to camera in first 3 seconds",
+  "format": "e.g. Reel 45s",
+  "imageSearch": "3-word Unsplash search term for B-roll",
+  "stagingAngle": "one sentence: how this video warms up future staging clients"
+}`;
+
+  try {
+    const raw = await claude([{role:'user', content: prompt}], sys);
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const ideas = JSON.parse(clean);
+
+    // Seed chat history
+    chatHistory = [
+      {role:'user', content:`My 4 video ideas for today:\n${ideas.map((v,i)=>`${i+1}. [${v.pillar}] ${v.title} — Opening hook: "${v.hook}"`).join('\n')}\n\nI may ask questions about any of these ideas.`},
+      {role:'assistant', content:`Your 4 ideas are ready! I can help you with scripts, hook variations, hashtags, filming tips, or advice on using each video to attract staging clients. Tap an idea card to select it, then head to Ask AI.`}
+    ];
+
+    document.getElementById('chatMsgs').innerHTML = `<div class="msg ai">Your 4 ideas are ready! Tap a card to select it, then come to Ask AI for scripts, hashtags, and staging business tips. 🏠</div>`;
+    document.getElementById('quickQs').style.display = 'flex';
+
+    document.getElementById('ideasBox').innerHTML = '<div class="ideas-list">' +
+      ideas.map((idea, i) => `
+        <div class="idea-card" id="card-${i}" onclick="selectIdea(${i}, ${JSON.stringify(idea).replace(/"/g,'&quot;')})">
+          <span class="pillar-badge pb-${idea.pillar}">${idea.pillar}</span>
+          <div class="idea-title">${idea.title}</div>
+          <div class="idea-hook">"${idea.hook}"</div>
+          <div class="idea-meta">
+            <span class="meta-item">⏱ ${idea.format}</span>
+            <span class="meta-item">🔍 "${idea.imageSearch}" on Unsplash</span>
+          </div>
+          <div class="idea-staging">${idea.stagingAngle}</div>
+        </div>`).join('') + '</div>';
+
+  } catch(e) {
+    document.getElementById('ideasBox').innerHTML = '<div class="empty"><div class="empty-icon">⚠️</div><div class="empty-text">Something went wrong. Check your connection and try again.</div></div>';
+  }
+
+  btn.disabled = false;
+  btn.textContent = '✦ Generate today\'s ideas';
+}
+
+// Select an idea
+function selectIdea(i, idea) {
+  document.querySelectorAll('.idea-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card-'+i).classList.add('selected');
+  selectedIdea = idea;
+
+  document.getElementById('selBanner').style.display = 'flex';
+  document.getElementById('selTitle').textContent = idea.title;
+
+  chatHistory.push(
+    {role:'user', content:`I want to focus on this idea: "${idea.title}" (${idea.pillar} pillar). Opening hook: "${idea.hook}". Format: ${idea.format}.`},
+    {role:'assistant', content:`Great choice — focusing on "${idea.title}". What do you need? I can write the full script, give you hook variations, suggest hashtags, explain how to film it on your iPhone at home, or show you how to use it to attract staging clients.`}
+  );
+
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="msg user">Selected: ${idea.title}</div><div class="msg ai">Great! Ask me for a script, hooks, hashtags, filming tips, or how this video can bring in staging clients. 🏠</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Auto-switch to chat
+  sw('chat');
+}
+
+// Quick question shortcut
+function sq(q) {
+  document.getElementById('chatIn').value = q;
+  sendChat();
+}
+
+// Send chat message
+async function sendChat() {
+  const inp = document.getElementById('chatIn');
+  const q = inp.value.trim();
+  if (!q) return;
+  inp.value = '';
+
+  const msgs = document.getElementById('chatMsgs');
+  msgs.innerHTML += `<div class="msg user">${q}</div>`;
+  const thinkingId = 'thinking-' + Date.now();
+  msgs.innerHTML += `<div class="msg ai" id="${thinkingId}">…</div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  chatHistory.push({role:'user', content: q});
+
+  const sys = `You are a social media strategist and home staging business advisor. The creator is in Melbourne, Australia. They film home decor content on their iPhone at home. Their long-term goal is to sell home staging services to home sellers. Be specific, actionable, and concise. Use short paragraphs. When listing things, use a simple numbered or dash format.`;
+
+  try {
+    const reply = await claude(chatHistory, sys);
+    chatHistory.push({role:'assistant', content: reply});
+    document.getElementById(thinkingId).innerHTML = reply.replace(/\n\n/g,'<br><br>').replace(/\n/g,'<br>');
+  } catch(e) {
+    document.getElementById(thinkingId).textContent = 'Error — check your connection and try again.';
+  }
+
+  msgs.scrollTop = msgs.scrollHeight;
+}
+</script>
+</body>
+</html>
